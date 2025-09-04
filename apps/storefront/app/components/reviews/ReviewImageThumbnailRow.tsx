@@ -13,10 +13,11 @@ export interface GalleryImage {
 export interface ReviewImageThumbnailRowProps {
   galleryImages?: GalleryImage[];
   onClick?: (index: number) => void;
+  reviewId?: string;
 }
 
-const GalleryImagesRow: FC<{ galleryImages: GalleryImage[]; onClick?: (index: number) => void }> = memo(
-  ({ galleryImages, onClick }) => {
+const GalleryImagesRow: FC<{ galleryImages: GalleryImage[]; onClick?: (index: number) => void; reviewId?: string }> = memo(
+  ({ galleryImages, onClick, reviewId }) => {
     return (
       <div className="py flex flex-row gap-2 after:block after:h-8 after:w-8 after:min-w-[8px] after:content-[''] md:p-0">
         {galleryImages.map((image, imageIndex) => (
@@ -24,7 +25,7 @@ const GalleryImagesRow: FC<{ galleryImages: GalleryImage[]; onClick?: (index: nu
             onClick={() => {
               if (typeof onClick === 'function') onClick(imageIndex);
             }}
-            key={image.url}
+            key={`${reviewId || 'unknown'}-${imageIndex}-${image.url}`}
             className="group relative flex h-24 w-24 flex-shrink-0 cursor-pointer justify-center overflow-hidden rounded-md border border-gray-100 bg-white text-sm font-bold uppercase text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-1"
           >
             <Image
@@ -42,7 +43,7 @@ const GalleryImagesRow: FC<{ galleryImages: GalleryImage[]; onClick?: (index: nu
   },
 );
 
-export const ReviewImageThumbnailRow: FC<ReviewImageThumbnailRowProps> = ({ galleryImages, onClick }) => {
+export const ReviewImageThumbnailRow: FC<ReviewImageThumbnailRowProps> = ({ galleryImages, onClick, reviewId }) => {
   if (!galleryImages) return null;
 
   const { scrollableDivRef, showStartArrow, showEndArrow, handleArrowClick } = useScrollArrows({
@@ -65,7 +66,7 @@ export const ReviewImageThumbnailRow: FC<ReviewImageThumbnailRowProps> = ({ gall
 
             <div className="relative -m-4 block h-24 overflow-hidden p-8 ">
               <div ref={scrollableDivRef} className="absolute -bottom-4 left-4 right-4 top-0 h-32 overflow-x-auto ">
-                <GalleryImagesRow galleryImages={galleryImages} onClick={onClick} />
+                <GalleryImagesRow galleryImages={galleryImages} onClick={onClick} reviewId={reviewId} />
               </div>
             </div>
           </div>
