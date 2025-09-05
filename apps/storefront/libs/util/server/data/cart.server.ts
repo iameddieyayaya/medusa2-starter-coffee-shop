@@ -63,9 +63,10 @@ export const addToCart = withAuthHeaders(
     data: {
       variantId: string;
       quantity: number;
+      customMessage?: string;
     },
   ) => {
-    const { variantId, quantity } = data;
+    const { variantId, quantity, customMessage } = data;
 
     if (!variantId) {
       throw new Error('Missing variant ID when adding to cart');
@@ -74,22 +75,41 @@ export const addToCart = withAuthHeaders(
     const cartId = await getCartId(request.headers);
 
     if (cartId) {
-      return await sdk.store.cart.createLineItem(
-        cartId,
-        {
-          variant_id: variantId,
-          quantity,
-        },
-        {},
-        authHeaders,
-      );
+      try {
+        return await sdk.store.cart.createLineItem(
+          cartId,
+          {
+            variant_id: variantId,
+            quantity,
+            ...(customMessage && { metadata: { custom_message: customMessage } }),
+          },
+          {},
+          authHeaders,
+        );
+      } catch (error) {
+        console.error('Cart not found or invalid, creating new cart:', error);
+      }
     }
 
     const region = await getSelectedRegion(request.headers);
 
-    const cart = await createCart(request, { region_id: region.id, items: [{ variant_id: variantId, quantity }] });
+    if (!region) {
+      throw new Error('No region found');
+    }
 
-    return cart;
+    const cartResponse = await createCart(request, {
+      region_id: region.id,
+      items: [{
+        variant_id: variantId,
+        quantity,
+      }],
+      ...(customMessage && { metadata: { custom_message: customMessage } })
+    });
+
+    return {
+      cart: cartResponse.cart,
+      wasRecreated: true
+    };
   },
 );
 
