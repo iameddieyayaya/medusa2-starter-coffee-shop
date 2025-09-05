@@ -1,10 +1,10 @@
 import { ButtonLink } from '@app/components/common/buttons/ButtonLink';
 import { Container } from '@app/components/common/container/Container';
-import { Image } from '@app/components/common/images/Image';
+import { ProductImageWithTextOverlay } from '@app/components/product/ProductImageWithTextOverlay';
 import { formatPhoneNumber } from '@libs/util/phoneNumber';
 import { formatPrice } from '@libs/util/prices';
 import { retrieveOrder } from '@libs/util/server/data/orders.server';
-import { StoreOrder, StorePaymentCollection } from '@medusajs/types';
+import { StoreOrder, StoreProduct } from '@medusajs/types';
 import { LoaderFunctionArgs, redirect } from 'react-router';
 import { Link, useLoaderData } from 'react-router';
 
@@ -50,13 +50,13 @@ export default function CheckoutSuccessRoute() {
             >
               {order.items?.map((item) => (
                 <li key={item.id} className="flex space-x-6 py-6">
-                  {item.thumbnail && (
-                    <Image
-                      src={item.thumbnail}
-                      alt={item.title}
-                      className="h-24 w-24 flex-none rounded-md bg-gray-100 object-cover object-center"
-                    />
-                  )}
+                  <ProductImageWithTextOverlay
+                    key={item.id}
+                    product={item.variant?.product as StoreProduct}
+                    customMessage={item?.metadata?.custom_message}
+                    showOverlay={true}
+                    img={item.thumbnail as string}
+                  />
                   <div className="flex flex-auto flex-col space-y-1">
                     <div>
                       <h3 className="text-base text-gray-900">

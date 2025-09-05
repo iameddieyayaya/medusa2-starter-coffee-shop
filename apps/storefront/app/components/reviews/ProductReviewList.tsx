@@ -53,6 +53,7 @@ export const ProductReviewList: FC<ProductReviewListProps> = ({ productReviews }
                   <ReviewImageThumbnailRow
                     galleryImages={galleryImages}
                     onClick={(imageIndex) => handleImageClick(galleryImages, imageIndex)}
+                    reviewId={review.id}
                   />
                 )}
 

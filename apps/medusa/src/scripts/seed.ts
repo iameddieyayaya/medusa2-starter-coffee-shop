@@ -348,6 +348,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
           name: 'Single Origin',
           is_active: true,
         },
+        {
+          name: 'Accessories',
+          is_active: true,
+        },
       ],
     },
   });
@@ -372,6 +376,9 @@ export default async function seedDemoData({ container }: ExecArgs) {
         },
         {
           value: 'Latin America',
+        },
+        {
+          value: 'Customizable',
         },
       ],
     },

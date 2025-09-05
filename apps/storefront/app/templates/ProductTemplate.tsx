@@ -6,7 +6,7 @@ import { Grid } from '@app/components/common/grid/Grid';
 import { GridColumn } from '@app/components/common/grid/GridColumn';
 import { SubmitButton } from '@app/components/common/remix-hook-form/buttons/SubmitButton';
 import { QuantitySelector } from '@app/components/common/remix-hook-form/field-groups/QuantitySelector';
-import { ProductImageGallery } from '@app/components/product/ProductImageGallery';
+import { ProductImageWithTextOverlay } from '@app/components/product/ProductImageWithTextOverlay';
 import { ProductOptionSelectorRadio } from '@app/components/product/ProductOptionSelectorRadio';
 import { ProductOptionSelectorSelect } from '@app/components/product/ProductOptionSelectorSelect';
 import { ProductPrice } from '@app/components/product/ProductPrice';
@@ -93,6 +93,7 @@ export const ProductTemplate = ({ product, reviewsCount, reviewStats }: ProductT
   const defaultValues = {
     productId: product.id!,
     quantity: '1',
+    customMessage: '',
     options: useMemo(() => {
       // Get the first variant as the default
       const firstVariant = product.variants?.[0];
@@ -319,7 +320,12 @@ export const ProductTemplate = ({ product, reviewsCount, reviewStats }: ProductT
                   <div className="md:py-6">
                     <Grid className="!gap-0">
                       <GridColumn className="mb-8 md:col-span-6 lg:col-span-7 xl:pr-16 xl:pl-9">
-                        <ProductImageGallery key={product.id} product={product} />
+                        <ProductImageWithTextOverlay
+                          key={product.id}
+                          product={product}
+                          customMessage={form.watch('customMessage') || ''}
+                          showOverlay={product.tags?.some(tag => tag.value === 'Customizable') && !!form.watch('customMessage')}
+                        />
                       </GridColumn>
 
                       <GridColumn className="flex flex-col md:col-span-6 lg:col-span-5">
@@ -397,6 +403,36 @@ export const ProductTemplate = ({ product, reviewsCount, reviewStats }: ProductT
                                   />
                                 </div>
                               ))}
+                            </section>
+                          )}
+
+                          {product.tags?.some(tag => tag.value === 'Customizable') && (
+                            <section aria-labelledby="custom-message" className="my-6">
+                              <h2 id="custom-message" className="sr-only">
+                                Custom Message
+                              </h2>
+                              <div className="space-y-2">
+                                <FieldLabel htmlFor="customMessage" className="text-sm font-medium text-gray-900">
+                                  What should we write on your mug?
+                                </FieldLabel>
+                                <input
+                                  required
+                                  id="customMessage"
+                                  type="text"
+                                  maxLength={40}
+                                  placeholder="Enter your custom message (max 40 characters)"
+                                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  {...form.register('customMessage')}
+                                />
+                                <p className="text-xs text-gray-500">
+                                  {form.watch('customMessage')?.length || 0}/40 characters
+                                </p>
+                                {form.formState.errors.customMessage && (
+                                  <p className="text-xs text-red-600">
+                                    {form.formState.errors.customMessage.message}
+                                  </p>
+                                )}
+                              </div>
                             </section>
                           )}
 

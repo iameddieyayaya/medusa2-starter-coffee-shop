@@ -5,6 +5,7 @@ import { formatLineItemPrice } from '@libs/util/prices';
 import { StoreCartLineItem } from '@medusajs/types';
 import clsx from 'clsx';
 import type { FC } from 'react';
+import { ProductImageWithTextOverlay } from '../product/ProductImageWithTextOverlay';
 
 export interface CartDrawerItemProps {
   item: StoreCartLineItem;
@@ -24,10 +25,11 @@ export const CartDrawerItem: FC<CartDrawerItemProps> = ({ item, currencyCode, is
       })}
     >
       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-        <Image
-          src={item.variant?.product?.thumbnail || ''}
-          alt={item.product_title || 'product thumbnail'}
-          className="h-full w-full object-cover object-center"
+        <ProductImageWithTextOverlay
+          key={item.id}
+          product={item.variant?.product as any}
+          customMessage={item?.metadata?.custom_message as string}
+          showOverlay={true}
         />
       </div>
 
@@ -37,6 +39,13 @@ export const CartDrawerItem: FC<CartDrawerItemProps> = ({ item, currencyCode, is
             <div>
               <h3 className="text-base font-bold text-gray-900">{item.product_title}</h3>
               <p className="mt-0.5 text-sm text-gray-500">{item.variant_title}</p>
+              <>
+                {item.metadata?.custom_message && (
+                  <p className="mt-1 text-xs text-blue-600 font-medium">
+                    Custom message: "{item.metadata.custom_message as string}"
+                  </p>
+                )}
+              </>
             </div>
             <Button variant="link" onClick={handleRemoveFromCart} disabled={isRemoving} className="text-sm">
               {isRemoving ? 'Removing' : 'Remove'}
